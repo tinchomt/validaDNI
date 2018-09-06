@@ -1,6 +1,7 @@
 package mt.com.peypedni.lectordni;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -8,6 +9,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.Map;
@@ -29,6 +32,10 @@ public class ValidarPersona extends AppCompatActivity {
     String valor_dni;
     String valor_sexo;
 
+    TextView txt_resultado_var, txt_detalle_var, txt_detalle_descrip_var;
+
+//    String result_valida;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,6 +54,10 @@ public class ValidarPersona extends AppCompatActivity {
             }
         });
 
+        txt_resultado_var =  (TextView) findViewById(R.id.editResultado);
+        txt_detalle_var =  (TextView) findViewById(R.id.editDescripResult);
+        txt_detalle_descrip_var =  (TextView) findViewById(R.id.txtDetalle);
+
         System.out.println("Paso 11 ");
          Intent intent = getIntent();
 
@@ -60,6 +71,11 @@ public class ValidarPersona extends AppCompatActivity {
             parserResultados(valores);
             valor_dni = mapaResultados.get("dni");
             valor_sexo = mapaResultados.get("sexo");
+
+        }else{
+
+            valor_dni = intent.getExtras().getString("dni");
+            valor_sexo =  intent.getExtras().getString("sexo");
         }
 
         System.out.println("Paso 13 ");
@@ -92,6 +108,23 @@ public class ValidarPersona extends AppCompatActivity {
                         System.out.println(response.body().toString());
                         System.out.println(response.body().getRESULTADO().getMotorDecision().getRow().getHabilitadoCredito());
 
+                        String res_val = response.body().getRESULTADO().getMotorDecision().getRow().getHabilitadoCredito();
+                        String var_result = parserValida(res_val);
+                        System.out.println("Var Result: "+var_result);
+
+                        if(var_result.contains("OK")){
+                            txt_resultado_var.setText("APROBADO");
+                            txt_resultado_var.setTextColor(Color.GREEN);
+                            txt_detalle_descrip_var.setVisibility(View.INVISIBLE);
+                            txt_detalle_var.setVisibility(View.INVISIBLE);
+
+                        }else{
+                            txt_resultado_var.setText("RECHAZADO");
+                            txt_resultado_var.setTextColor(Color.RED);
+                            txt_detalle_var.setText(var_result);
+                        }
+
+
                     }else{
 
                         Toast.makeText(getApplicationContext(), "No esta Registrado el DNI",
@@ -120,5 +153,14 @@ public class ValidarPersona extends AppCompatActivity {
         mapaResultados.put("dni",val[4]);
         mapaResultados.put("f_nacimiento",val[6]);
 
+    }
+
+    public String parserValida(String valores){
+
+        String[] val = valores.split("@");
+
+       String result_valida = val[0];
+
+       return result_valida;
     }
 }

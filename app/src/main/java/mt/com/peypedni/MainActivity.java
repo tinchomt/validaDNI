@@ -18,6 +18,9 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import com.google.android.gms.vision.barcode.Barcode;
@@ -30,6 +33,11 @@ public class MainActivity extends AppCompatActivity
 
     Button scanbtn, buscarPorDni;
     TextView result, var_docu;
+    EditText txt_dni;
+
+    private RadioGroup radioSexGroup;
+    private RadioButton radioSexButton;
+    private Button btnBuscar;
 
     public static final int REQUEST_CODE = 100;
     public static final int PERMISSION_REQUEST = 200;
@@ -62,6 +70,10 @@ public class MainActivity extends AppCompatActivity
 
         result = (TextView) findViewById(R.id.result);
 
+        btnBuscar = (Button) findViewById(R.id.buscarPersona);
+        radioSexGroup = (RadioGroup) findViewById(R.id.radioSex);
+        txt_dni =  (EditText) findViewById(R.id.editDNI);
+
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, PERMISSION_REQUEST);
         }
@@ -73,6 +85,26 @@ public class MainActivity extends AppCompatActivity
                 System.out.println("Paso 1");
                 startActivityForResult(intent, REQUEST_CODE);
                 System.out.println("Paso 2");
+            }
+        });
+
+        btnBuscar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int selectedId = radioSexGroup.getCheckedRadioButtonId();
+                // find the radiobutton by returned id
+                radioSexButton = (RadioButton) findViewById(selectedId);
+
+                Intent i_resultado = new Intent(getBaseContext(),ValidarPersona.class);
+                System.out.println("Paso 7 "+radioSexButton.getText());
+                System.out.println("Paso 8 "+ txt_dni.getText().toString());
+
+                i_resultado.putExtra("sexo",radioSexButton.getText());
+                i_resultado.putExtra("dni",txt_dni.getText().toString());
+
+                System.out.println("Paso 9 ");
+
+                startActivity(i_resultado);
             }
         });
     }
